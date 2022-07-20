@@ -1,7 +1,8 @@
 package main
 
 import (
-	"log"
+	"fmt"
+	_"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,9 +26,10 @@ func main()  {
 }
 
 type QueryInput struct {
-	Title string
-	Price int `json:"price_per_pcs"`
-	Summ int
+	// validator input
+	Title string `json:"title" binding:"required"`
+	Price int `json:"price_per_pcs" binding:"required,number"`
+	Summ int `json:"summ" binding:"required,number"`
 }
 
 func postQueryHandler(c *gin.Context) {
@@ -35,7 +37,10 @@ func postQueryHandler(c *gin.Context) {
 	var queryInput QueryInput
 	err := c.ShouldBindJSON(&queryInput)
 	if err != nil {
-		log.Fatal(err)
+		// log.Fatal(err) //akan memberhentikan server jika terjadi error
+		c.JSON(http.StatusBadRequest, err)
+		fmt.Println(err)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
